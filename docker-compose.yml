@@ -10,14 +10,21 @@ services:
     volumes:
       - ./app/instance:/app/instance
       - ./data:/app/data
+      # Ensure the volume has proper permissions
+      - /tmp:/tmp
     environment:
       - DATABASE_URL=sqlite:///instance/emails.db
       - GITHUB_REPO_PATH=/app/data
       - SYNC_INTERVAL_MINUTES=${SYNC_INTERVAL_MINUTES:-30}
       - FLASK_ENV=${FLASK_ENV:-production}
     restart: unless-stopped
-    depends_on:
-      - email-sender
+    # Ensure the instance directory exists on host
+    command: >
+      sh -c "
+        mkdir -p /app/instance &&
+        chmod 755 /app/instance &&
+        gunicorn --bind 0.0.0.0:5000 app:app --workers 4 --timeout 120
+      "
 
   email-sender:
     build:
@@ -26,6 +33,7 @@ services:
     volumes:
       - ./app/instance:/app/instance
       - ./data:/app/data
+      - /tmp:/tmp
     environment:
       - DATABASE_URL=sqlite:///instance/emails.db
       - GITHUB_REPO_PATH=/app/data
@@ -38,6 +46,9 @@ services:
       - BATCH_DELAY_SECONDS=${BATCH_DELAY_SECONDS:-120}
       - BATCH_SIZE=${BATCH_SIZE:-100}
     restart: unless-stopped
+    depends_on:
+      - web
 
 volumes:
   data:
+    driver: local
