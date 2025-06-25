@@ -1,0 +1,16 @@
+# Core dependencies
+pandas==2.1.4
+openpyxl==3.1.2
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.23
+PyGithub==2.1.1
+python-dotenv==1.0.0
+Werkzeug==3.0.1
+gunicorn==21.2.0
+APScheduler==3.10.4
+
+# Development dependencies
+pylint==3.0.3
+black==23.12.1
+flake8==6.1.0
